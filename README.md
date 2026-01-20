@@ -1,4 +1,3 @@
-# LN 1/19/26
 # Futures Calculator App
 
 A professional, production-ready web application for calculating profit/loss and managing margin requirements for multiple futures contracts. Built with modern web technologies and designed for traders who need precise calculations across different futures symbols.
