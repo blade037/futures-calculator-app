@@ -8,6 +8,7 @@ A professional, production-ready web application for calculating profit/loss and
 - **Real-time Calculations**: Instant profit/loss calculations based on entry/exit prices
 - **Margin Management**: Track initial and maintenance margin requirements
 - **Contract Specifications**: Built-in data for popular futures contracts
+- **Tax Calculator**: Section 1256 tax treatment with optional California state tax (13.3%)
 - **Responsive Design**: Beautiful, modern UI that works on all devices
 - **Professional Grade**: Production-ready with attention to detail and user experience
 
@@ -26,6 +27,9 @@ This project runs in a WebContainer environment with automatic dependency manage
 ### Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
 # Start the development server
 npm run dev
 ```
@@ -44,6 +48,7 @@ npm run preview
 
 ## 🎯 Usage
 
+### Futures Calculator
 1. **Select a Futures Symbol**: Choose from popular contracts (ES, NQ, YM, etc.)
 2. **Enter Trade Details**:
    - Entry price
@@ -56,6 +61,16 @@ npm run preview
    - Margin requirements
    - Contract specifications
 
+### Tax Calculator
+1. **Enter Profit/Loss**: Input your total futures trading profit or loss
+2. **Enable CA Tax** (Optional): Toggle California state tax if applicable
+3. **Calculate**: View detailed breakdown including:
+   - Section 1256 treatment (60% long-term, 40% short-term)
+   - Federal tax liability
+   - California state tax (if enabled)
+   - After-tax profit/loss
+   - Effective tax rates
+
 ## 📁 Project Structure
 
 ```
@@ -64,6 +79,7 @@ futures-calculator-app/
 │   ├── components/
 │   │   ├── Header.jsx          # App header with branding
 │   │   ├── CalculatorCard.jsx  # Main calculator interface
+│   │   ├── TaxCalculator.jsx   # Section 1256 tax calculator
 │   │   ├── ResultsPanel.jsx    # P&L results display
 │   │   ├── InfoCards.jsx       # Educational information
 │   │   └── Footer.jsx          # App footer
@@ -111,6 +127,20 @@ Optimized for React with HMR (Hot Module Replacement) for instant updates during
 - **Gold (GC)** - $100 per point
 - **Euro FX (6E)** - $125,000 per point
 - **10-Year T-Note (ZN)** - $1,000 per point
+
+## 💰 Tax Information
+
+### Section 1256 Treatment
+Futures contracts receive favorable tax treatment under Section 1256:
+- **60%** taxed as long-term capital gains (20% rate)
+- **40%** taxed as short-term capital gains (38% rate)
+- Applies regardless of holding period
+- Mark-to-market on December 31st
+
+### California State Tax
+- Optional 13.3% state tax for CA residents
+- Applied to total profit/loss
+- Toggle on/off in the tax calculator
 
 ## 🌐 Browser Support
 
