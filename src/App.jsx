@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Header from './components/Header'
 import CalculatorCard from './components/CalculatorCard'
 import ResultsPanel from './components/ResultsPanel'
+import TaxCalculator from './components/TaxCalculator'
 import InfoCards from './components/InfoCards'
 import Footer from './components/Footer'
 
@@ -30,7 +31,7 @@ function App() {
               Professional P&L Calculator
             </h2>
             <p className="text-xl text-textSecondary max-w-3xl mx-auto">
-              Calculate profit/loss and manage margin requirements for multiple futures contracts with precision
+              Calculate profit/loss, manage margin requirements, and estimate tax liability for futures contracts
             </p>
           </motion.div>
 
@@ -44,6 +45,11 @@ function App() {
             <div className="lg:col-span-1">
               <ResultsPanel results={results} />
             </div>
+          </div>
+
+          {/* Tax Calculator Section */}
+          <div className="mb-12">
+            <TaxCalculator />
           </div>
 
           <InfoCards />
