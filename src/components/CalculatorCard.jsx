@@ -100,6 +100,10 @@ const CalculatorCard = ({ setResults }) => {
       startingBalance,
       isProfit: profitLoss >= 0,
       contractSpecs,
+      // Add these for saving to database
+      entryPrice: entry,
+      exitPrice: exit,
+      numContracts: contracts
     }
 
     setResults(result)

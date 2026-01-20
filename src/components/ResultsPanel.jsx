@@ -1,36 +1,32 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TrendingUp, TrendingDown, AlertCircle, Save, Check, Wallet } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertCircle, Save, Check, Wallet, X } from 'lucide-react'
+import { profitLossDB } from '../utils/profitLossDatabase'
 
 const ResultsPanel = ({ results }) => {
   const [saveStatus, setSaveStatus] = useState(null)
+  const [notes, setNotes] = useState('')
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!results) return
 
-    const timestamp = new Date().toISOString()
-    const savedData = {
-      timestamp,
-      calculationType: 'profit-loss',
-      results,
-      formattedDate: new Date().toLocaleString()
+    try {
+      const resultsToSave = {
+        ...results,
+        entryPrice: results.entryPrice || 0,
+        exitPrice: results.exitPrice || 0,
+        numContracts: results.numContracts || 0
+      }
+
+      await profitLossDB.saveCalculation(resultsToSave, notes)
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus(null), 2000)
+      setNotes('')
+    } catch (error) {
+      console.error('Failed to save calculation:', error)
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus(null), 2000)
     }
-
-    // Get existing saved results
-    const existingSaves = JSON.parse(localStorage.getItem('futuresCalculatorResults') || '[]')
-    
-    // Add new result
-    existingSaves.unshift(savedData)
-    
-    // Keep only last 50 results
-    const trimmedSaves = existingSaves.slice(0, 50)
-    
-    // Save to localStorage
-    localStorage.setItem('futuresCalculatorResults', JSON.stringify(trimmedSaves))
-
-    // Show success feedback
-    setSaveStatus('saved')
-    setTimeout(() => setSaveStatus(null), 2000)
   }
 
   if (!results) {
@@ -49,7 +45,6 @@ const ResultsPanel = ({ results }) => {
     )
   }
 
-  // Safety check for contractSpecs
   if (!results.contractSpecs) {
     return (
       <motion.div
@@ -79,42 +74,10 @@ const ResultsPanel = ({ results }) => {
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold">Results</h3>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleSave}
-          className="flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 rounded-xl transition-all"
-        >
-          <AnimatePresence mode="wait">
-            {saveStatus === 'saved' ? (
-              <motion.div
-                key="check"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-                className="flex items-center gap-2"
-              >
-                <Check className="w-4 h-4 text-success" />
-                <span className="text-sm font-semibold text-success">Saved!</span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="save"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-                className="flex items-center gap-2"
-              >
-                <Save className="w-4 h-4" />
-                <span className="text-sm font-semibold">Save</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.button>
       </div>
 
       <div className="space-y-4">
-        {/* Profit/Loss Card - Full Width */}
+        {/* Profit/Loss Card */}
         <motion.div
           whileHover={{ scale: 1.02 }}
           className={`p-6 rounded-xl border transition-all bg-gradient-to-br ${
@@ -133,6 +96,9 @@ const ResultsPanel = ({ results }) => {
           </div>
           <p className={`text-4xl font-bold ${results.isProfit ? 'text-success' : 'text-error'}`}>
             ${(results.profitLoss || 0).toFixed(2)}
+          </p>
+          <p className="text-sm text-textSecondary mt-2">
+            {results.profitLossPct >= 0 ? '+' : ''}{results.profitLossPct.toFixed(2)}% return
           </p>
         </motion.div>
 
@@ -190,6 +156,63 @@ const ResultsPanel = ({ results }) => {
 
         {/* Contract Specs Card */}
         <ContractSpecsCard specs={results.contractSpecs} />
+
+        {/* Save Section */}
+        <div className="bg-background/30 border border-border/20 rounded-xl p-5">
+          <h4 className="text-sm font-semibold text-textSecondary mb-3">Save This Calculation</h4>
+          <div className="space-y-3">
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add notes (optional)..."
+              className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:outline-none focus:border-primary transition-colors text-sm resize-none"
+              rows="3"
+            />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSave}
+              className="w-full py-3 bg-gradient-to-r from-primary to-secondary rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/50 transition-all"
+            >
+              <AnimatePresence mode="wait">
+                {saveStatus === 'saved' ? (
+                  <motion.div
+                    key="check"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-success" />
+                    <span className="text-success">Saved!</span>
+                  </motion.div>
+                ) : saveStatus === 'error' ? (
+                  <motion.div
+                    key="error"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <X className="w-4 h-4 text-error" />
+                    <span className="text-error">Error</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="save"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Calculation</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
+        </div>
       </div>
     </motion.div>
   )

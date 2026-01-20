@@ -4,11 +4,13 @@ import Header from './components/Header'
 import CalculatorCard from './components/CalculatorCard'
 import ResultsPanel from './components/ResultsPanel'
 import TaxCalculator from './components/TaxCalculator'
+import SavedResultsTabs from './components/SavedResultsTabs'
 import InfoCards from './components/InfoCards'
 import Footer from './components/Footer'
 
 function App() {
   const [results, setResults] = useState(null)
+  const [activeCalculator, setActiveCalculator] = useState('profit-loss')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-surface">
@@ -35,22 +37,74 @@ function App() {
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-12">
-            <div className="lg:col-span-2">
-              <CalculatorCard 
-                setResults={setResults}
-              />
-            </div>
-            
-            <div className="lg:col-span-1">
-              <ResultsPanel results={results} />
-            </div>
+          {/* Saved Results Section - Moved to Top */}
+          <div className="mb-12">
+            <SavedResultsTabs />
           </div>
 
-          {/* Tax Calculator Section */}
-          <div className="mb-12">
-            <TaxCalculator />
-          </div>
+          {/* Calculator Tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex gap-2 border-b border-border/30">
+              <button
+                onClick={() => setActiveCalculator('profit-loss')}
+                className={`relative px-6 py-3 font-semibold transition-colors ${
+                  activeCalculator === 'profit-loss'
+                    ? 'text-primary'
+                    : 'text-textSecondary hover:text-text'
+                }`}
+              >
+                <span>Profit/Loss Calculator</span>
+                {activeCalculator === 'profit-loss' && (
+                  <motion.div
+                    layoutId="activeCalculator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveCalculator('tax')}
+                className={`relative px-6 py-3 font-semibold transition-colors ${
+                  activeCalculator === 'tax'
+                    ? 'text-primary'
+                    : 'text-textSecondary hover:text-text'
+                }`}
+              >
+                <span>Tax Calculator</span>
+                {activeCalculator === 'tax' && (
+                  <motion.div
+                    layoutId="activeCalculator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Calculator Content */}
+          {activeCalculator === 'profit-loss' ? (
+            <div className="grid lg:grid-cols-3 gap-8 mb-12">
+              <div className="lg:col-span-2">
+                <CalculatorCard 
+                  setResults={setResults}
+                />
+              </div>
+              
+              <div className="lg:col-span-1">
+                <ResultsPanel results={results} />
+              </div>
+            </div>
+          ) : (
+            <div className="mb-12">
+              <TaxCalculator />
+            </div>
+          )}
 
           <InfoCards />
         </main>
